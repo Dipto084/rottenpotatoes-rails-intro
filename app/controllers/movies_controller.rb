@@ -10,26 +10,18 @@ class MoviesController < ApplicationController
       @all_ratings = Movie.all_ratings
       
       # select ratings
-      sort_by = params[:sort] || session[:sort]
+      @sort = params[:sort] || session[:sort]
       @selected_ratings = params[:ratings] || session[:ratings] || Hash[@all_ratings.map { |rating| [rating, 1] }]
       
       if !params[:commit].nil? || params[:ratings].nil? || (params[:sort].nil? && !session[:sort].nil?)
         flash.keep
-        redirect_to movies_path :sort => sort_by, :ratings => @selected_ratings
+        redirect_to movies_path :sort => @sort, :ratings => @selected_ratings
       end
       
-      @movies = Movie.with_ratings(@selected_ratings.keys).order(sort_by)
+      @movies = Movie.with_ratings(@selected_ratings.keys).order(@sort)
       
       
-      # set sorting background
-      if sort_by == 'title'
-      # @title_header = 'p-3 mb-2 bg-warning text-dark'
-        @title_header = "hilite"
-      elsif sort_by == 'release_date'
-        @release_header = "hilite"
-      end
-      
-      session[:sort] = sort_by
+      session[:sort] = @sort
       session[:ratings] = @selected_ratings
   end
 
